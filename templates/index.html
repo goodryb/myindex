@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>直播状态导航页</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 15px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+            align-items: start;
+        }
+        
+        .column {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        
+        .column-content {
+            flex: 1;
+        }
+        
+        .column-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #f0f0f0;
+            color: #333;
+            display: flex;
+            align-items: center;
+        }
+        
+        .column-title::before {
+            content: '';
+            display: inline-block;
+            width: 6px;
+            height: 20px;
+            background: linear-gradient(to bottom, #667eea, #764ba2);
+            border-radius: 3px;
+            margin-right: 10px;
+        }
+        
+        .status-card {
+            background: #f8f9fa;
+            border-radius: 6px;
+            padding: 10px;
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+            border: 1px solid #eee;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .status-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+        }
+        
+        .status-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .status-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .live {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            box-shadow: 0 0 8px rgba(255, 107, 107, 0.5);
+        }
+        
+        .offline {
+            background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+        }
+        
+        .status-text {
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        
+        .live-text {
+            color: #e74c3c;
+        }
+        
+        .offline-text {
+            color: #7f8c8d;
+        }
+        
+        .zhibo-link {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            text-decoration: none;
+            padding: 5px 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .zhibo-link:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+        }
+        
+        .zhibo-link:active {
+            transform: translateY(0);
+        }
+        
+        .video-item {
+            background: #f8f9fa;
+            border-radius: 6px;
+            padding: 10px;
+            margin-bottom: 8px;
+            transition: all 0.3s ease;
+            border: 1px solid #eee;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .video-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+        }
+        
+        .video-title {
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #2c3e50;
+            font-size: 0.9rem;
+        }
+        
+        .video-title-link {
+            color: #2c3e50;
+            text-decoration: none;
+        }
+        
+        .video-title-link:hover {
+            text-decoration: underline;
+            color: #667eea;
+        }
+        
+        .video-link {
+            color: #667eea;
+            text-decoration: none;
+            font-size: 0.8rem;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+        }
+        
+        .video-link:hover {
+            text-decoration: underline;
+        }
+        
+        .video-link::after {
+            content: '↗';
+            margin-left: 5px;
+            font-size: 0.6rem;
+        }
+        
+        .sites-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+        
+        .site-link {
+            background: #f8f9fa;
+            border-radius: 6px;
+            padding: 10px;
+            transition: all 0.3s ease;
+            border: 1px solid #eee;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            text-decoration: none;
+            color: #2c3e50;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            font-size: 0.9rem;
+        }
+        
+        .site-icon {
+            width: 18px;
+            height: 18px;
+            margin-right: 8px;
+            border-radius: 3px;
+        }
+        
+        .site-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+            background: #fff;
+        }
+        
+        .site-link::after {
+            content: '↗';
+            margin-left: auto;
+            color: #667eea;
+        }
+        
+        .product-item {
+            background: #f8f9fa;
+            border-radius: 6px;
+            padding: 10px;
+            margin-bottom: 8px;
+            transition: all 0.3s ease;
+            border: 1px solid #eee;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .product-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+        }
+        
+        .product-title {
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 0.9rem;
+        }
+        
+        .product-title-link {
+            color: #2c3e50;
+            text-decoration: none;
+        }
+        
+        .product-title-link:hover {
+            text-decoration: underline;
+            color: #667eea;
+        }
+        
+        .no-content {
+            text-align: center;
+            color: #95a5a6;
+            font-style: italic;
+            padding: 15px 10px;
+            font-size: 0.85rem;
+        }
+        
+        .no-content::before {
+            content: '📭';
+            font-size: 1.2rem;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        /* 夜间模式支持 */
+        @media (prefers-color-scheme: dark) {
+            body {
+                background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            }
+
+            .column {
+                background: rgba(30, 30, 46, 0.95);
+                border-color: rgba(255, 255, 255, 0.1);
+                box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            }
+
+            .column-title {
+                color: #e0e0e0;
+                border-bottom-color: #2d2d3a;
+            }
+
+            .status-card, .video-item, .site-link, .product-item {
+                background: #252538;
+                border-color: #2d2d3a;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            }
+
+            .status-card:hover, .video-item:hover, .site-link:hover, .product-item:hover {
+                background: #2d2d4a;
+                box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+            }
+
+            .video-title-link, .product-title-link, .site-link {
+                color: #e0e0e0;
+            }
+
+            .video-title-link:hover, .product-title-link:hover {
+                color: #a0b4ff;
+            }
+
+            .video-title {
+                color: #e0e0e0;
+            }
+
+            .site-link:hover {
+                background: #32324d;
+            }
+
+            h3 {
+                color: #b0b0cf !important;
+            }
+
+            .no-content {
+                color: #7f8c8d;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            
+            .header h1 {
+                font-size: 1.6rem;
+            }
+            
+            body {
+                padding: 10px;
+            }
+            
+            .container {
+                max-width: 100%;
+            }
+            
+            .sites-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="main-content">
+            <!-- 商品信息 -->
+            <div class="column">
+                <div class="column-title">优惠商品信息</div>
+                <div class="column-content" id="products-area">
+                    {% if products %}
+                        {% for product in products %}
+                        <div class="product-item">
+                            <div class="product-title">
+                                <a href="{{ product.link }}" class="product-title-link" target="_blank">{{ product.title }}</a>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="no-content">最近24小时暂无商品信息</div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- 今日视频 -->
+            <div class="column">
+                <div class="column-title">今日视频</div>
+                <div class="column-content" id="upvideos-area">
+                    {% if up_videos %}
+                        {% for key, up_info in up_videos.items() %}
+                            {% if up_info.videolist %}
+                                <h3 style="margin: 0 0 10px 0; color: #34495e; font-size: 1rem;">{{ up_info.name }}</h3>
+                                {% for video in up_info.videolist %}
+                                <div class="video-item">
+                                    <div class="video-title">
+                                        <a href="{{ video.videourl }}" class="video-title-link" target="_blank">{{ video.videoname }}</a>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            {% else %}
+                                <h3 style="margin: 0 0 10px 0; color: #34495e; font-size: 1rem;">{{ up_info.name }}</h3>
+                                <!-- 当UP主当天没有视频时，不显示任何内容 -->
+                            {% endif %}
+                        {% endfor %}
+                    {% else %}
+                        <div class="no-content">暂无UP主信息</div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- 常用网站链接 -->
+            <div class="column">
+                <div class="column-title">常用网站</div>
+                <div class="column-content" id="sites-area">
+                    {% if changyong_sites %}
+                        <div class="sites-container">
+                            {% for site in changyong_sites %}
+                            <a href="{{ site.url }}" class="site-link" target="_blank">
+                                {% if site.icon_url %}
+                                <img src="{{ site.icon_url }}" alt="{{ site.name }}" class="site-icon">
+                                {% endif %}
+                                {{ site.name }}
+                            </a>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="no-content">暂无常用网站</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // HTML 转义，防止外部数据（如爬虫标题）注入页面
+        function escapeHtml(str) {
+            var div = document.createElement('div');
+            div.textContent = str == null ? '' : String(str);
+            return div.innerHTML.replace(/"/g, '&quot;');
+        }
+
+        function renderProducts(products) {
+            var area = document.getElementById('products-area');
+            if (!products || products.length === 0) {
+                area.innerHTML = '<div class="no-content">最近24小时暂无商品信息</div>';
+                return;
+            }
+            var html = '';
+            products.forEach(function(product) {
+                html += '<div class="product-item">' +
+                    '<div class="product-title">' +
+                    '<a href="' + escapeHtml(product.link) + '" class="product-title-link" target="_blank">' +
+                    escapeHtml(product.title) + '</a></div></div>';
+            });
+            area.innerHTML = html;
+        }
+
+        function renderVideos(upVideos) {
+            var area = document.getElementById('upvideos-area');
+            if (!upVideos || Object.keys(upVideos).length === 0) {
+                area.innerHTML = '<div class="no-content">暂无UP主信息</div>';
+                return;
+            }
+            var html = '';
+            Object.keys(upVideos).forEach(function(key) {
+                var info = upVideos[key];
+                html += '<h3 style="margin: 0 0 10px 0; color: #34495e; font-size: 1rem;">' + escapeHtml(info.name) + '</h3>';
+                (info.videolist || []).forEach(function(video) {
+                    html += '<div class="video-item">' +
+                        '<div class="video-title">' +
+                        '<a href="' + escapeHtml(video.videourl) + '" class="video-title-link" target="_blank">' +
+                        escapeHtml(video.videoname) + '</a></div></div>';
+                });
+            });
+            area.innerHTML = html;
+        }
+
+        function renderSites(sites) {
+            var area = document.getElementById('sites-area');
+            if (!sites || sites.length === 0) {
+                area.innerHTML = '<div class="no-content">暂无常用网站</div>';
+                return;
+            }
+            var html = '<div class="sites-container">';
+            sites.forEach(function(site) {
+                html += '<a href="' + escapeHtml(site.url) + '" class="site-link" target="_blank">';
+                if (site.icon_url) {
+                    html += '<img src="' + escapeHtml(site.icon_url) + '" alt="' + escapeHtml(site.name) + '" class="site-icon">';
+                }
+                html += escapeHtml(site.name) + '</a>';
+            });
+            html += '</div>';
+            area.innerHTML = html;
+        }
+
+        function refreshData() {
+            fetch('/api/home')
+                .then(function(response) { return response.json(); })
+                .then(function(data) {
+                    renderProducts(data.products);
+                    renderVideos(data.up_videos);
+                    renderSites(data.changyong_sites);
+                })
+                .catch(function() {
+                    // 刷新失败时保持当前内容，等待下一轮重试
+                });
+        }
+
+        // 每60秒局部刷新页面数据，替代原先的整页 reload
+        setInterval(refreshData, 60000); // 60000毫秒 = 1分钟
+    </script>
+</body>
+</html>

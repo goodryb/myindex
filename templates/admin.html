@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>后台管理</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab.active {
+            border-bottom: 3px solid #667eea;
+            color: #667eea;
+            background: #f8f9ff;
+        }
+
+        .tab-content {
+            display: none;
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: #555;
+        }
+
+        tr:hover {
+            background-color: #f5f9ff;
+        }
+
+        .site-icon-preview {
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+
+        .btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            margin: 0 2px;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5a6fd8;
+        }
+
+        .btn-danger {
+            background: #ff6b6b;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #e55c5c;
+        }
+
+        .btn-success {
+            background: #51cf66;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #46b95a;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .form-col {
+            flex: 1;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .modal-header {
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .modal-header h2 {
+            font-size: 1.5rem;
+            color: #333;
+        }
+
+        .close {
+            float: right;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .close:hover {
+            color: #333;
+        }
+
+        .form-actions {
+            margin-top: 20px;
+            text-align: right;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 5px;
+            color: white;
+            font-weight: 500;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 2000;
+            display: none;
+        }
+
+        .notification.success {
+            background: #51cf66;
+        }
+
+        .notification.error {
+            background: #ff6b6b;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+            
+            th, td {
+                padding: 8px 10px;
+                font-size: 0.9rem;
+            }
+        }
+
+        /* 夜间模式支持 */
+        @media (prefers-color-scheme: dark) {
+            body {
+                background: #121212;
+                color: #e0e0e0;
+            }
+
+            .tabs, .tab-content, .modal-content {
+                background: #1e1e1e;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            }
+
+            .tab.active {
+                background: #252525;
+                color: #8fa3ff;
+                border-bottom-color: #8fa3ff;
+            }
+
+            .tab {
+                color: #b0b0b0;
+            }
+
+            .tab:hover {
+                color: #e0e0e0;
+                background: #2d2d2d;
+            }
+
+            .tab.active:hover {
+                background: #252525;
+            }
+
+            th {
+                background-color: #252525;
+                color: #b0b0b0;
+            }
+
+            th, td {
+                border-bottom-color: #2d2d2d;
+            }
+
+            tr:hover {
+                background-color: #252525;
+            }
+
+            .form-group label {
+                color: #b0b0b0;
+            }
+
+            .form-group input, .form-group select {
+                background-color: #252525;
+                border-color: #3d3d3d;
+                color: #e0e0e0;
+            }
+
+            .form-group input:focus, .form-group select:focus {
+                border-color: #667eea;
+                outline: none;
+            }
+
+            .modal-header {
+                border-bottom-color: #2d2d2d;
+            }
+
+            .modal-header h2 {
+                color: #e0e0e0;
+            }
+
+            .close:hover {
+                color: #fff;
+            }
+
+            h2 {
+                color: #e0e0e0;
+            }
+
+            table {
+                color: #e0e0e0;
+            }
+
+            .site-icon-preview {
+                border: 1px solid #3d3d3d;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="tabs">
+            <div class="tab active" data-tab="daohang">常用网站</div>
+            <div class="tab" data-tab="upuser">UP主</div>
+            <div class="tab" data-tab="keywords">商品关键字</div>
+        </div>
+
+        <!-- 常用网站管理 -->
+        <div class="tab-content active" id="daohang-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2>常用网站管理</h2>
+                <button class="btn btn-success" onclick="openAddModal('daohang')">添加网站</button>
+            </div>
+            
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>网站名称</th>
+                            <th>网址</th>
+                            <th>图标</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in daohang_data %}
+                        <tr>
+                            <td>{{ item.id }}</td>
+                            <td>{{ item.cn_name }}</td>
+                            <td>{{ item.url }}</td>
+                            <td>
+                                {% if item.icon_url %}
+                                <img src="{{ item.icon_url }}" alt="{{ item.cn_name }}" class="site-icon-preview">
+                                {% endif %}
+                            </td>
+                            <td>
+                                <button class="btn btn-primary" onclick='openEditModal("daohang", {{ item | tojson }})'>编辑</button>
+                                <button class="btn btn-danger" onclick="deleteRecord('daohang', {{ item.id }})">删除</button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- UP主管理 -->
+        <div class="tab-content" id="upuser-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2>UP主管理</h2>
+                <button class="btn btn-success" onclick="openAddModal('upuser')">添加UP主</button>
+            </div>
+            
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>UP主ID</th>
+                            <th>平台</th>
+                            <th>中文名称</th>
+                            <th>Account ID</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in upuser_data %}
+                        <tr>
+                            <td>{{ item.upid }}</td>
+                            <td>{{ item.platform }}</td>
+                            <td>{{ item.cn_name or '' }}</td>
+                            <td>{{ item.accountid or '' }}</td>
+                            <td>
+                                <button class="btn btn-primary" onclick='openEditModal("upuser", {{ item | tojson }})'>编辑</button>
+                                <button class="btn btn-danger" onclick="deleteRecord('upuser', '{{ item.upid }}')">删除</button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 商品关键字管理 -->
+        <div class="tab-content" id="keywords-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2>商品关键字管理</h2>
+                <button class="btn btn-success" onclick="openAddModal('keywords')">添加关键字</button>
+            </div>
+            
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>关键字</th>
+                            <th>站点类型</th>
+                            <th>启用状态</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in keywords_data %}
+                        <tr>
+                            <td>{{ item.id }}</td>
+                            <td>{{ item.keyword }}</td>
+                            <td>{{ item.site_type }}</td>
+                            <td>{{ '启用' if item.enabled == 1 else '禁用' }}</td>
+                            <td>
+                                <button class="btn btn-primary" onclick='openEditModal("keywords", {{ item | tojson }})'>编辑</button>
+                                <button class="btn btn-danger" onclick="deleteRecord('keywords', {{ item.id }})">删除</button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- 添加/编辑模态框 -->
+    <div class="modal" id="editModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">编辑记录</h2>
+                <span class="close" onclick="closeModal()">&times;</span>
+            </div>
+            <form id="editForm">
+                <input type="hidden" id="editType">
+                <input type="hidden" id="editId">
+                <div id="formFields"></div>
+                <div class="form-actions">
+                    <button type="button" class="btn" onclick="closeModal()" style="background: #95a5a6;">取消</button>
+                    <button type="submit" class="btn btn-success">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 通知 -->
+    <div class="notification" id="notification"></div>
+
+    <script>
+        // 标签页切换
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                // 移除所有活动状态
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                
+                // 添加活动状态到当前标签
+                tab.classList.add('active');
+                const tabId = tab.getAttribute('data-tab');
+                document.getElementById(`${tabId}-content`).classList.add('active');
+            });
+        });
+
+        // 打开添加模态框
+        function openAddModal(type) {
+            document.getElementById('editType').value = type;
+            document.getElementById('editId').value = '';
+            document.getElementById('modalTitle').textContent = '添加记录';
+            
+            let formFields = '';
+            
+            if (type === 'daohang') {
+                formFields = `
+                    <div class="form-group">
+                        <label for="cn_name">网站名称:</label>
+                        <input type="text" id="cn_name" name="cn_name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="url">网址:</label>
+                        <input type="text" id="url" name="url" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="icon_url">图标地址:</label>
+                        <input type="text" id="icon_url" name="icon_url">
+                    </div>
+                `;
+            } else if (type === 'upuser') {
+                formFields = `
+                    <div class="form-group">
+                        <label for="upid">UP主ID:</label>
+                        <input type="text" id="upid" name="upid" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="platform">平台:</label>
+                        <input type="text" id="platform" name="platform" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="cn_name">中文名称:</label>
+                        <input type="text" id="cn_name" name="cn_name">
+                    </div>
+                    <div class="form-group">
+                        <label for="accountid">Account ID:</label>
+                        <input type="number" id="accountid" name="accountid" required>
+                    </div>
+                `;
+            } else if (type === 'keywords') {
+                formFields = `
+                    <div class="form-group">
+                        <label for="keyword">关键字:</label>
+                        <input type="text" id="keyword" name="keyword" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="site_type">站点类型:</label>
+                        <input type="text" id="site_type" name="site_type" value="smzdm" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="enabled">启用状态:</label>
+                        <select id="enabled" name="enabled" required>
+                            <option value="1">启用</option>
+                            <option value="0">禁用</option>
+                        </select>
+                    </div>
+                `;
+            }
+            
+            document.getElementById('formFields').innerHTML = formFields;
+            document.getElementById('editModal').style.display = 'flex';
+        }
+
+        // 打开编辑模态框
+        function openEditModal(type, data) {
+            document.getElementById('editType').value = type;
+            document.getElementById('editId').value = data.id || data.upid;
+            document.getElementById('modalTitle').textContent = '编辑记录';
+            
+            let formFields = '';
+            
+            if (type === 'daohang') {
+                formFields = `
+                    <input type="hidden" name="id" value="${data.id}">
+                    <div class="form-group">
+                        <label for="cn_name">网站名称:</label>
+                        <input type="text" id="cn_name" name="cn_name" value="${data.cn_name || ''}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="url">网址:</label>
+                        <input type="text" id="url" name="url" value="${data.url || ''}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="icon_url">图标地址:</label>
+                        <input type="text" id="icon_url" name="icon_url" value="${data.icon_url || ''}">
+                    </div>
+                `;
+            } else if (type === 'upuser') {
+                formFields = `
+                    <input type="hidden" name="upid" value="${data.upid}">
+                    <div class="form-group">
+                        <label for="platform">平台:</label>
+                        <input type="text" id="platform" name="platform" value="${data.platform || ''}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="cn_name">中文名称:</label>
+                        <input type="text" id="cn_name" name="cn_name" value="${data.cn_name || ''}">
+                    </div>
+                    <div class="form-group">
+                        <label for="accountid">Account ID:</label>
+                        <input type="number" id="accountid" name="accountid" value="${data.accountid || ''}" required>
+                    </div>
+                `;
+            } else if (type === 'keywords') {
+                formFields = `
+                    <input type="hidden" name="id" value="${data.id}">
+                    <div class="form-group">
+                        <label for="keyword">关键字:</label>
+                        <input type="text" id="keyword" name="keyword" value="${data.keyword || ''}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="site_type">站点类型:</label>
+                        <input type="text" id="site_type" name="site_type" value="${data.site_type || 'smzdm'}" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="enabled">启用状态:</label>
+                        <select id="enabled" name="enabled" required>
+                            <option value="1" ${data.enabled == 1 ? 'selected' : ''}>启用</option>
+                            <option value="0" ${data.enabled == 0 ? 'selected' : ''}>禁用</option>
+                        </select>
+                    </div>
+                `;
+            }
+            
+            document.getElementById('formFields').innerHTML = formFields;
+            document.getElementById('editModal').style.display = 'flex';
+        }
+
+        // 关闭模态框
+        function closeModal() {
+            document.getElementById('editModal').style.display = 'none';
+        }
+
+        // 表单提交处理
+        document.getElementById('editForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const type = document.getElementById('editType').value;
+            const formData = new FormData(this);
+            const isAdd = !document.getElementById('editId').value;
+            
+            let url = '';
+            if (type === 'daohang') {
+                url = isAdd ? '/admin/daohang/add' : '/admin/daohang/update';
+            } else if (type === 'upuser') {
+                url = isAdd ? '/admin/upuser/add' : '/admin/upuser/update';
+            } else if (type === 'keywords') {
+                url = isAdd ? '/admin/keywords/add' : '/admin/keywords/update';
+            }
+            
+            fetch(url, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showNotification('操作成功！', 'success');
+                    closeModal();
+                    setTimeout(() => location.reload(), 1000);
+                } else {
+                    showNotification('操作失败: ' + data.error, 'error');
+                }
+            })
+            .catch(error => {
+                showNotification('操作失败: ' + error.message, 'error');
+            });
+        });
+
+        // 删除记录
+        function deleteRecord(type, id) {
+            if (!confirm('确定要删除这条记录吗？')) {
+                return;
+            }
+            
+            let url = '';
+            let formData = new FormData();
+            
+            if (type === 'daohang') {
+                url = '/admin/daohang/delete';
+                formData.append('id', id);
+            } else if (type === 'upuser') {
+                url = '/admin/upuser/delete';
+                formData.append('upid', id);
+            } else if (type === 'keywords') {
+                url = '/admin/keywords/delete';
+                formData.append('id', id);
+            }
+            
+            fetch(url, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showNotification('删除成功！', 'success');
+                    setTimeout(() => location.reload(), 1000);
+                } else {
+                    showNotification('删除失败: ' + data.error, 'error');
+                }
+            })
+            .catch(error => {
+                showNotification('删除失败: ' + error.message, 'error');
+            });
+        }
+
+        // 显示通知
+        function showNotification(message, type) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = 'notification ' + type;
+            notification.style.display = 'block';
+            
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 3000);
+        }
+
+        // 点击模态框外部关闭
+        window.onclick = function(event) {
+            const modal = document.getElementById('editModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+    </script>
+</body>
+</html>

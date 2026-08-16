@@ -1,0 +1,14 @@
+# 自动检测文本文件并根据操作系统自动转换换行符（提交时转为 LF，检出时转为当前系统标准）
+* text=auto
+
+# 明确指定某些文件始终使用 LF (通常用于 shell 脚本或 Docker 相关文件)
+*.sh text eol=lf
+Dockerfile text eol=lf
+.dockerignore text eol=lf
+
+# 明确指定某些文件为二进制文件，不进行换行符转换
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
