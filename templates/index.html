@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>直播状态导航页</title>
+    <title>MyIndex 导航页</title>
     <style>
         * {
             margin: 0;
@@ -68,81 +68,7 @@
             margin-right: 10px;
         }
         
-        .status-card {
-            background: #f8f9fa;
-            border-radius: 6px;
-            padding: 10px;
-            margin-bottom: 10px;
-            transition: all 0.3s ease;
-            border: 1px solid #eee;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        }
         
-        .status-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 3px 8px rgba(0,0,0,0.1);
-        }
-        
-        .status-header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 8px;
-        }
-        
-        .status-indicator {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            display: inline-block;
-            margin-right: 8px;
-            transition: all 0.3s ease;
-        }
-        
-        .live {
-            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
-            box-shadow: 0 0 8px rgba(255, 107, 107, 0.5);
-        }
-        
-        .offline {
-            background: linear-gradient(135deg, #95a5a6, #7f8c8d);
-        }
-        
-        .status-text {
-            font-size: 0.9rem;
-            font-weight: 600;
-        }
-        
-        .live-text {
-            color: #e74c3c;
-        }
-        
-        .offline-text {
-            color: #7f8c8d;
-        }
-        
-        .zhibo-link {
-            display: inline-block;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            text-decoration: none;
-            padding: 5px 10px;
-            border-radius: 12px;
-            font-size: 0.75rem;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            border: none;
-            cursor: pointer;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        
-        .zhibo-link:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 3px 8px rgba(0,0,0,0.15);
-        }
-        
-        .zhibo-link:active {
-            transform: translateY(0);
-        }
         
         .video-item {
             background: #f8f9fa;
@@ -298,13 +224,13 @@
                 border-bottom-color: #2d2d3a;
             }
 
-            .status-card, .video-item, .site-link, .product-item {
+            .video-item, .site-link, .product-item {
                 background: #252538;
                 border-color: #2d2d3a;
                 box-shadow: 0 2px 4px rgba(0,0,0,0.2);
             }
 
-            .status-card:hover, .video-item:hover, .site-link:hover, .product-item:hover {
+            .video-item:hover, .site-link:hover, .product-item:hover {
                 background: #2d2d4a;
                 box-shadow: 0 3px 8px rgba(0,0,0,0.3);
             }

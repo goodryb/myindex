@@ -1,6 +1,6 @@
 # MyIndex 项目
 
-这是一个基于 Flask 的内容导航网站，支持显示主播直播状态、UP 主视频更新和常用网站链接。
+这是一个基于 Flask 的内容导航网站，支持显示优惠商品信息、UP 主视频更新和常用网站链接。
 
 ## 功能特性
 
@@ -35,15 +35,14 @@ DB_NAME=myindex
 
 ### 数据库表结构
 
-项目需要以下七张表：
+项目需要以下六张表：
 
 1. `upuser` - UP 主信息表
 2. `upvideo` - UP 主视频信息表
-3. `zhibo` - 主播直播信息表
-4. `daohang` - 常用网站导航表
-5. `event_heartbeat` - 事件心跳记录表
-6. `smzdm_keywords` - 商品搜索关键词表
-7. `smzdm_products` - 商品信息表
+3. `daohang` - 常用网站导航表
+4. `event_heartbeat` - 事件心跳记录表
+5. `smzdm_keywords` - 商品搜索关键词表
+6. `smzdm_products` - 商品信息表
 
 表结构定义请参考 `sql/` 目录下的 SQL 文件。
 
@@ -187,7 +186,6 @@ myindex/
 ├── sql/                # 数据库表结构定义
 │   ├── upuser.sql
 │   ├── upvideo.sql
-│   ├── zhibo.sql
 │   ├── daohang.sql
 │   ├── event_heartbeat.sql
 │   ├── smzdm_keywords.sql

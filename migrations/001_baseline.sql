@@ -1,4 +1,4 @@
--- 001_baseline.sql: 初始表结构（由 sql/ 目录 7 张表合并，幂等设计，表已存在时迁移器自动跳过）
+-- 001_baseline.sql: 初始表结构（由 sql/ 目录 6 张表合并，幂等设计，表已存在时迁移器自动跳过）
 
 -- UP 主信息表
 create table upuser
@@ -25,20 +25,6 @@ create table upvideo
         foreign key (upid) references upuser (upid)
 )
     comment 'up视频信息';
-
--- 主播直播信息表
-create table zhibo
-(
-    roomid         varchar(100) not null comment '直播间id',
-    cn_name        varchar(100) not null comment '主播中文名称',
-    status         tinyint      not null comment '直播状态',
-    address        varchar(100) not null comment '直播地址',
-    name           varchar(100) not null comment '英文唯一id'
-        primary key,
-    last_push_date date         null comment '最后推送日期',
-    type           varchar(50)  null comment '类型'
-)
-    comment '直播信息表';
 
 -- 常用网址信息
 create table daohang
