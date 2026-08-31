@@ -1,0 +1,30 @@
+name: Cleanup Docker Hub Tag
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to delete'
+        required: true
+        default: 'master'
+
+jobs:
+  delete-tag:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete tag via Docker Hub API
+        env:
+          DH_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          DH_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+          TAG: ${{ inputs.tag }}
+        run: |
+          set -euo pipefail
+          TOKEN=$(curl -s -d "{\"username\":\"${DH_USERNAME}\",\"password\":\"${DH_TOKEN}\"}" \
+            -H "Content-Type: application/json" \
+            https://hub.docker.com/v2/users/login/ | \
+            python3 -c "import sys,json; print(json.load(sys.stdin)['token'])")
+          CODE=$(curl -s -o del_resp.json -w "%{http_code}" -X DELETE \
+            -H "Authorization: JWT ${TOKEN}" \
+            "https://hub.docker.com/v2/repositories/${DH_USERNAME}/myindex/tags/${TAG}/")
+          echo "HTTP ${CODE}"
+          cat del_resp.json
+          [ "${CODE}" = "200" ] || [ "${CODE}" = "404" ]
